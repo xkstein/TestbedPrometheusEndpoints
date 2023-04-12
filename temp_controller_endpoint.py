@@ -21,8 +21,10 @@ class TempCollector:
         while True:
             try:
                 self.connection = Model336(ip_address=self.ip_address, **self.kwargs)
+                break
             except socket.timeout:
                 if (time.time() - start_time) > fail_time:
+                    print(f'Was not able to start connection with lakeshore after {fail_time}s of trying')
                     raise Exception('Was not able to start connection with lakeshore after {}s of trying'.format(fail_time))
                 else:
                     time.sleep(1)
