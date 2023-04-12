@@ -35,7 +35,7 @@ class TempCollector:
         except AttributeError:
             self.connect()
         except Exception as e:
-            logging.log(e)
+            logging.log((e))
             self.connect()
 
         try:
@@ -45,8 +45,8 @@ class TempCollector:
             heater = self.connection.get_heater_output(1)
             heater_range = self.connection.get_heater_range(1)
         except (InstrumentException, socket.timeout) as e:
-            print(e)
-            logging.error(e)
+            print(str(e))
+            logging.error(str(e))
             return
 
         yield GaugeMetricFamily(
