@@ -23,7 +23,7 @@ class InstrumentWrapper:
         try:
             wrapped_method = getattr(self.connection, attr)
             return wrapped_method
-        except (ConnectionError, socket.timeout, BrokenPipeError):
+        except (ConnectionError, socket.timeout, BrokenPipeError) as e:
             self.connect()
         except AttributeError as e:
             if self.connection is not None:
