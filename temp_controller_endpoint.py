@@ -16,13 +16,16 @@ class TempCollector:
         self.connection = None
         self.kwargs = dict(timeout=1.0)
 
+        self.connect()
+
     def connect(self, fail_time=60) -> None:
         start_time = time.time()
         while True:
             try:
                 self.connection = Model336(ip_address=self.ip_address, **self.kwargs)
+                print('Connected')
                 break
-            except socket.timeout:
+            except (socket.timeout, OSError):
                 if (time.time() - start_time) > fail_time:
                     print(f'Was not able to start connection with lakeshore after {fail_time}s of trying')
                     raise Exception('Was not able to start connection with lakeshore after {}s of trying'.format(fail_time))
@@ -35,7 +38,7 @@ class TempCollector:
         except AttributeError:
             self.connect()
         except Exception as e:
-            logging.log((e))
+            logging.exception('Could not get status bit connect')
             self.connect()
 
         try:
@@ -45,8 +48,7 @@ class TempCollector:
             heater = self.connection.get_heater_output(1)
             heater_range = self.connection.get_heater_range(1)
         except (InstrumentException, socket.timeout) as e:
-            print(str(e))
-            logging.error(str(e))
+            logging.exception('Could not read from lakeshore')
             return
 
         yield GaugeMetricFamily(
